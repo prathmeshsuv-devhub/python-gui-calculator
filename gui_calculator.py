@@ -1,16 +1,17 @@
 import tkinter as tk
+import math
 
 
-# ---------------- WINDOW ----------------
+# ================= WINDOW =================
 
 window = tk.Tk()
-window.title("My Calculator")
-window.geometry("380x700")
+window.title("Scientific Calculator")
+window.geometry("400x760")
 window.resizable(False, False)
 window.configure(bg="#202124")
 
 
-# ---------------- DISPLAY ----------------
+# ================= DISPLAY =================
 
 display = tk.Entry(
     window,
@@ -30,7 +31,7 @@ display.pack(
 )
 
 
-# ---------------- HISTORY ----------------
+# ================= HISTORY =================
 
 history_label = tk.Label(
     window,
@@ -42,11 +43,10 @@ history_label = tk.Label(
 
 history_label.pack()
 
-
 history_box = tk.Listbox(
     window,
     height=5,
-    font=("Arial", 12),
+    font=("Arial", 11),
     bg="#303134",
     fg="white",
     bd=0
@@ -59,7 +59,7 @@ history_box.pack(
 )
 
 
-# ---------------- FUNCTIONS ----------------
+# ================= BASIC FUNCTIONS =================
 
 def button_click(value):
     display.insert(tk.END, value)
@@ -76,45 +76,23 @@ def backspace():
         display.delete(len(current) - 1, tk.END)
 
 
-def percentage():
-    try:
-        value = float(display.get())
-        result = value / 100
-
-        display.delete(0, tk.END)
-        display.insert(0, result)
-
-    except ValueError:
-        display.delete(0, tk.END)
-        display.insert(0, "Error")
-
-
-def plus_minus():
-    try:
-        value = float(display.get())
-        result = -value
-
-        display.delete(0, tk.END)
-        display.insert(0, result)
-
-    except ValueError:
-        display.delete(0, tk.END)
-        display.insert(0, "Error")
-
+# ================= CALCULATE =================
 
 def calculate():
     try:
-        expression = display.get()
+        original_expression = display.get()
+
+        expression = original_expression.replace("^", "**")
+        expression = expression.replace("π", str(math.pi))
 
         result = eval(expression)
 
         display.delete(0, tk.END)
         display.insert(0, result)
 
-        # Add calculation to history
         history_box.insert(
             tk.END,
-            f"{expression} = {result}"
+            f"{original_expression} = {result}"
         )
 
     except:
@@ -122,11 +100,161 @@ def calculate():
         display.insert(0, "Error")
 
 
+# ================= SCIENTIFIC FUNCTIONS =================
+
+def square_root():
+    try:
+        expression = display.get()
+        value = float(expression)
+
+        if value < 0:
+            raise ValueError
+
+        result = math.sqrt(value)
+
+        display.delete(0, tk.END)
+        display.insert(0, result)
+
+        history_box.insert(
+            tk.END,
+            f"√{value} = {result}"
+        )
+
+    except:
+        display.delete(0, tk.END)
+        display.insert(0, "Error")
+
+
+def square():
+    try:
+        expression = display.get()
+        value = float(expression)
+
+        result = value ** 2
+
+        display.delete(0, tk.END)
+        display.insert(0, result)
+
+        history_box.insert(
+            tk.END,
+            f"{value}² = {result}"
+        )
+
+    except:
+        display.delete(0, tk.END)
+        display.insert(0, "Error")
+
+
+def sine():
+    try:
+        value = float(display.get())
+
+        result = math.sin(math.radians(value))
+
+        display.delete(0, tk.END)
+        display.insert(0, result)
+
+        history_box.insert(
+            tk.END,
+            f"sin({value}) = {result}"
+        )
+
+    except:
+        display.delete(0, tk.END)
+        display.insert(0, "Error")
+
+
+def cosine():
+    try:
+        value = float(display.get())
+
+        result = math.cos(math.radians(value))
+
+        display.delete(0, tk.END)
+        display.insert(0, result)
+
+        history_box.insert(
+            tk.END,
+            f"cos({value}) = {result}"
+        )
+
+    except:
+        display.delete(0, tk.END)
+        display.insert(0, "Error")
+
+
+def tangent():
+    try:
+        value = float(display.get())
+
+        result = math.tan(math.radians(value))
+
+        display.delete(0, tk.END)
+        display.insert(0, result)
+
+        history_box.insert(
+            tk.END,
+            f"tan({value}) = {result}"
+        )
+
+    except:
+        display.delete(0, tk.END)
+        display.insert(0, "Error")
+
+
+def percentage():
+    try:
+        value = float(display.get())
+
+        result = value / 100
+
+        display.delete(0, tk.END)
+        display.insert(0, result)
+
+        history_box.insert(
+            tk.END,
+            f"{value}% = {result}"
+        )
+
+    except:
+        display.delete(0, tk.END)
+        display.insert(0, "Error")
+
+
+def plus_minus():
+    try:
+        value = float(display.get())
+
+        result = -value
+
+        display.delete(0, tk.END)
+        display.insert(0, result)
+
+    except:
+        display.delete(0, tk.END)
+        display.insert(0, "Error")
+
+
+# ================= HISTORY =================
+
 def clear_history():
     history_box.delete(0, tk.END)
 
 
-# ---------------- BUTTON FRAME ----------------
+# ================= SCIENTIFIC BUTTONS =================
+
+scientific_buttons = [
+    ("√", square_root, 0, 0),
+    ("x²", square, 0, 1),
+    ("sin", sine, 0, 2),
+    ("cos", cosine, 0, 3),
+
+    ("tan", tangent, 1, 0),
+    ("π", lambda: button_click("π"), 1, 1),
+    ("^", lambda: button_click("^"), 1, 2),
+    ("%", percentage, 1, 3)
+]
+
 
 button_frame = tk.Frame(
     window,
@@ -136,28 +264,17 @@ button_frame = tk.Frame(
 button_frame.pack()
 
 
-# ---------------- SPECIAL BUTTONS ----------------
-
-special_buttons = [
-    ("C", clear_display, 0, 0),
-    ("⌫", backspace, 0, 1),
-    ("%", percentage, 0, 2),
-    ("+/-", plus_minus, 0, 3)
-]
-
-
-for text, command, row, column in special_buttons:
+for text, command, row, column in scientific_buttons:
 
     tk.Button(
         button_frame,
         text=text,
-        font=("Arial", 16, "bold"),
+        font=("Arial", 14, "bold"),
         width=5,
         height=2,
         bg="#5f6368",
         fg="white",
         activebackground="#80868b",
-        activeforeground="white",
         bd=0,
         command=command
     ).grid(
@@ -168,48 +285,47 @@ for text, command, row, column in special_buttons:
     )
 
 
-# ---------------- NUMBER BUTTONS ----------------
+# ================= BASIC BUTTONS =================
 
 buttons = [
-    ("7", 1, 0),
-    ("8", 1, 1),
-    ("9", 1, 2),
-    ("/", 1, 3),
+    ("C", clear_display, 2, 0),
+    ("⌫", backspace, 2, 1),
+    ("(", lambda: button_click("("), 2, 2),
+    (")", lambda: button_click(")"), 2, 3),
 
-    ("4", 2, 0),
-    ("5", 2, 1),
-    ("6", 2, 2),
-    ("*", 2, 3),
+    ("7", lambda: button_click("7"), 3, 0),
+    ("8", lambda: button_click("8"), 3, 1),
+    ("9", lambda: button_click("9"), 3, 2),
+    ("/", lambda: button_click("/"), 3, 3),
 
-    ("1", 3, 0),
-    ("2", 3, 1),
-    ("3", 3, 2),
-    ("-", 3, 3),
+    ("4", lambda: button_click("4"), 4, 0),
+    ("5", lambda: button_click("5"), 4, 1),
+    ("6", lambda: button_click("6"), 4, 2),
+    ("*", lambda: button_click("*"), 4, 3),
 
-    ("0", 4, 0),
-    (".", 4, 1),
-    ("+", 4, 2),
-    ("=", 4, 3)
+    ("1", lambda: button_click("1"), 5, 0),
+    ("2", lambda: button_click("2"), 5, 1),
+    ("3", lambda: button_click("3"), 5, 2),
+    ("-", lambda: button_click("-"), 5, 3),
+
+    ("0", lambda: button_click("0"), 6, 0),
+    (".", lambda: button_click("."), 6, 1),
+    ("+/-", plus_minus, 6, 2),
+    ("+", lambda: button_click("+"), 6, 3)
 ]
 
 
-for text, row, column in buttons:
-
-    if text == "=":
-        command = calculate
-    else:
-        command = lambda value=text: button_click(value)
+for text, command, row, column in buttons:
 
     tk.Button(
         button_frame,
         text=text,
-        font=("Arial", 18),
+        font=("Arial", 17, "bold"),
         width=5,
         height=2,
         bg="#3c4043",
         fg="white",
         activebackground="#5f6368",
-        activeforeground="white",
         bd=0,
         command=command
     ).grid(
@@ -220,7 +336,29 @@ for text, row, column in buttons:
     )
 
 
-# ---------------- CLEAR HISTORY ----------------
+# ================= EQUAL BUTTON =================
+
+tk.Button(
+    button_frame,
+    text="=",
+    font=("Arial", 18, "bold"),
+    width=23,
+    height=2,
+    bg="#3c4043",
+    fg="white",
+    activebackground="#5f6368",
+    bd=0,
+    command=calculate
+).grid(
+    row=7,
+    column=0,
+    columnspan=4,
+    padx=5,
+    pady=5
+)
+
+
+# ================= CLEAR HISTORY =================
 
 tk.Button(
     window,
@@ -235,7 +373,7 @@ tk.Button(
 ).pack(pady=10)
 
 
-# ---------------- KEYBOARD SUPPORT ----------------
+# ================= KEYBOARD SUPPORT =================
 
 def keyboard_input(event):
 
@@ -252,6 +390,6 @@ def keyboard_input(event):
 window.bind("<Key>", keyboard_input)
 
 
-# ---------------- START ----------------
+# ================= START =================
 
 window.mainloop()
