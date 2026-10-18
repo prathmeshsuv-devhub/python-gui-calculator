@@ -1,2 +1,1 @@
-# No external packages required
-# Tkinter and math are included with Python
+streamlit==1.66.0
